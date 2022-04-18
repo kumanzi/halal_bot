@@ -2,6 +2,10 @@
 #This example requires the 'members' privileged intents
 
 import discord
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class MyClient(discord.Client):
     def __init__(self, *args, **kwargs):
@@ -85,4 +89,4 @@ intents = discord.Intents.default()
 intents.members = True
 
 client = MyClient(intents=intents)
-client.run('OTY1NDgwMjA3NDE2OTc1NDIx.Ylzzgw.FDF22hoeyCpvC8w4TC4wBsgJhCE')
+client.run(os.getenv('TOKEN'))
