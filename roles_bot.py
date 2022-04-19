@@ -85,6 +85,17 @@ class MyClient(discord.Client):
             # If we want to do something in case of errors we'd do it here.
             pass
 
+    @client.event
+    async def on_message(message):
+    	if message.author == client.user:
+    	    return
+
+    	if 'salam' in message.content:
+    	    await message.channel.send('Salam!')
+	if 'salaam' in message.content:
+	    await message.channel.send('Salaam!')
+	
+
 intents = discord.Intents.default()
 intents.members = True
 
