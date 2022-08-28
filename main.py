@@ -12,12 +12,14 @@ class MyClient(discord.Client):
         super().__init__(*args, **kwargs)
 
         self.role_message_id = 965491438689333309 # ID of the message that can be reacted to to add/remove a role.
+        #self.perm_role_message_id = 965113814318186556 # ID of message to give user role
         self.emoji_to_role = {
             discord.PartialEmoji(name='1️⃣'): 965491634278129685, # ID of the role associated with unicode emoji '1️⃣'.
             discord.PartialEmoji(name='2️⃣'): 965491786665558048, # ID of the role associated with unicode emoji '2️⃣'.
             discord.PartialEmoji(name='3️⃣'): 965491756487544863, # ID of the role associated with unicode emoji '3️⃣'.
             discord.PartialEmoji(name='4️⃣'): 965491726691229727, # ID of the role associated with unicode emoji '4️⃣'.
             discord.PartialEmoji(name='5️⃣'): 965491679622750218, # ID of the role associated with unicode emoji '5️⃣'.
+            discord.PartialEmoji(name='✅'): 964825887738576896, # ID of the role associated with unicode emoji '✅'.
         }
 
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
@@ -85,15 +87,15 @@ class MyClient(discord.Client):
             # If we want to do something in case of errors we'd do it here.
             pass
 
-    @client.event
-    async def on_message(message):
-    	if message.author == client.user:
-    	    return
+#    @client.event
+#    async def on_message(message):
+#    	if message.author == client.user:
+#    	    return
 
-    	if 'salam' in message.content:
-    	    await message.channel.send('Salam!')
-	if 'salaam' in message.content:
-	    await message.channel.send('Salaam!')
+#    	if 'salam' in message.content:
+#    	    await message.channel.send('Salam!')
+#	if 'salaam' in message.content:
+#	    await message.channel.send('Salaam!')
 	
 
 intents = discord.Intents.default()
