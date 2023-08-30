@@ -1,17 +1,26 @@
+from typing import Optional
 import discord
-# from discord import app_commands
-# from discord.ext import commands
-# from discord.ext.commands import Bot
+from discord import app_commands
 import os
 import time
 from threading import Timer
 from dotenv import load_dotenv
 
+MY_GUILD = discord.Object(id=964434050062364684)
+
+class MyClient(discord.Client):
+    def __init__(self, *, intents: discord.Intents):
+        super().__init__(intents=intents)
+        self.tree = app_commands.CommandTree(self)
+
+    async def setup_hook(self):
+        self.tree.copy_global_to(guild=MY_GUILD)
+        await self.tree.sync(guild=MY_GUILD)
+
 load_dotenv()
 intents = discord.Intents.default()
 intents.members = True
-client = discord.Client(intents = intents)
-# tree = discord.app_commands.CommandTree(client)
+client = MyClient(intents=intents)
 client.channelId = 1142138293581004901  #channel to send messages
 client.userDict = {}    #dictionary of users w/ time they entered voice to keep track of time each user is in voice
 client.activeUsers = 0  #number of users currently in voice
@@ -27,14 +36,15 @@ def checkUserTimes():
 
 client.voiceTimer = Timer(client.interval, checkUserTimes)
 
-# @tree.command()
-# async def setInterval(self, interval):
-#     try:
-#         client.interval = float(interval)
-#     except:
-#         await self.send("Invalid input. Please provide a singular numerical argument.")
-#         exit()
-#     await self.send(f"Interval set to {interval/60} minutes")
+@client.tree.command()
+@app_commands.describe(new_interval='The new reminder interval (in minutes) you want to set',)
+async def interval(interaction: discord.Interaction, new_interval: Optional[float] = None):
+    """Views or sets new reminder interval."""
+    if(new_interval == None):
+        await interaction.response.send_message(f'Current interval is {client.interval/60:.2f} min')
+    else:
+        client.interval = new_interval * 60
+        await interaction.response.send_message(f'New interval is {client.interval/60:.2f} min (will update after all users leave voice)')
 
 @client.event
 async def on_ready():
