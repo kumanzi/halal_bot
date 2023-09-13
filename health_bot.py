@@ -26,12 +26,16 @@ client.userDict = {}    #dictionary of users w/ time they entered voice to keep 
 client.activeUsers = 0  #number of users currently in voice
 client.interval = 10  #time interval (in sec) for reminders
 client.voiceTimer = Timer(.1, time.sleep(.1))
+client.matthewTimer = Timer(.1, time.sleep(.1))
+client.matthew = False
 
 #checks how long users have been in voice and acts accordingly
 def checkUserTimes():
     if(client.activeUsers > 0):
         for user in client.userDict:
             print(f"{user} has been in vc for {time.time() - client.userDict[user]}")
+            channel = client.get_channel(client.channelId)              #get channel to send message
+            client.loop.create_task(channel.send(f'<@{user}> time to get up you fat!!!'))
         client.voiceTimer.run()
 
 client.voiceTimer = Timer(client.interval, checkUserTimes)
@@ -45,6 +49,15 @@ async def interval(interaction: discord.Interaction, new_interval: Optional[floa
     else:
         client.interval = new_interval * 60
         await interaction.response.send_message(f'New interval is {client.interval/60:.2f} min (will update after all users leave voice)')
+
+@client.tree.command()
+async def matthew(interaction: discord.Interaction):
+    """Toggles Matthew function."""
+    client.matthew = not client.matthew
+    if(client.matthew):
+        await interaction.response.send_message(f'Matthew mode enabled')
+    else:
+        await interaction.response.send_message(f'Matthew mode disabled')
 
 @client.event
 async def on_ready():
@@ -61,21 +74,21 @@ async def on_voice_state_update(member, before, after):
                     client.voiceTimer.start()
                 except:
                     client.voiceTimer.run()
-            channel = client.get_channel(client.channelId)              #get channel to send message
-            name = str(await client.fetch_user(member.id)).split('#')   #get username
-            await channel.send(f'{name[0]} joined')                     #send message indicating who joined
+            #channel = client.get_channel(client.channelId)              #get channel to send message
+            #name = str(await client.fetch_user(member.id)).split('#')   #get username
+            #await channel.send(f'{name[0]} joined')                     #send message indicating who joined
             client.activeUsers += 1                                     
             print(f"{client.activeUsers} users in vc")                  #update number of active users
         #Sends message with user name if a user LEAVES voice including time specific user spent in voice
         if before.channel and not after.channel:
             try:
-                elapsed_time = time.time() - client.userDict[member.id] #calculate elapsed time in voice (NEED TO ADD TRY CASE)
+                elapsed_time = time.time() - client.userDict[member.id] #calculate elapsed time in voice
             except:
                 elapsed_time = -1
             client.userDict[member.id] = -1                             #reset dict time to show user left voice
-            channel = client.get_channel(client.channelId)              #get channel to send message
-            name = str(await client.fetch_user(member.id)).split('#')   #get username
-            await channel.send(f'{name[0]} left ({elapsed_time:.2f}s)') #send message with username and time spent in voice
+            #channel = client.get_channel(client.channelId)              #get channel to send message
+            #name = str(await client.fetch_user(member.id)).split('#')   #get username
+            #await channel.send(f'{name[0]} left ({elapsed_time:.2f}s)') #send message with username and time spent in voice
             if(client.activeUsers > 0):
                 client.activeUsers -= 1
             if(client.activeUsers == 0):
